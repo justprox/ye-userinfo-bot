@@ -1,0 +1,14 @@
+# Environment and secrets
+.env
+
+# Binary
+ye-userinfo-bot
+*.exe
+*.out
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+.vercel
+.env*
