@@ -38,6 +38,7 @@ jobs:
 
   build-reproducible-binaries:
     name: Build Reproducible Binary (Linux x64)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/tags/v'))
     needs: test-and-lint
     runs-on: ubuntu-latest
     steps:
