@@ -68,7 +68,7 @@ jobs:
           cat checksums.txt
 
       - name: Upload Binary Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ye-userinfo-bot-linux-amd64
           path: dist/
@@ -76,7 +76,7 @@ jobs:
       # 1. Rolling Release on every commit merged to master
       - name: Publish Rolling Latest Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: latest
           name: "Latest Automated Build"
@@ -92,7 +92,7 @@ jobs:
       # 2. Tagged Release on version tags (e.g. v1.0.0)
       - name: Publish Tagged Version Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             dist/*
