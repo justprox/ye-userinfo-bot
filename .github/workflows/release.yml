@@ -80,14 +80,20 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create latest dist/* \
-            --title "Latest Automated Build" \
-            --notes "### 🤖 Automated Reproducible Build for \`master\`
+          NOTES="### 🤖 Automated Reproducible Build for \`master\`
           - **Commit:** \`${{ github.sha }}\`
           - **Branch:** \`master\`
-          - **Transparency:** Check \`checksums.txt\` to verify SHA-256 binary integrity against \`/about\` in the bot." \
-            --generate-notes \
-            --clobber
+          - **Transparency:** Check \`checksums.txt\` to verify SHA-256 binary integrity against \`/about\` in the bot."
+
+          if gh release view latest >/dev/null 2>&1; then
+            gh release upload latest dist/* --clobber
+            gh release edit latest --title "Latest Automated Build" --notes "$NOTES"
+          else
+            gh release create latest dist/* \
+              --title "Latest Automated Build" \
+              --notes "$NOTES" \
+              --generate-notes
+          fi
 
       # 2. Tagged Release on version tags (Native GitHub CLI)
       - name: Publish Tagged Version Release
@@ -98,5 +104,4 @@ jobs:
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           gh release create "$TAG_NAME" dist/* \
             --title "$TAG_NAME" \
-            --generate-notes \
-            --clobber
+            --generate-notes
