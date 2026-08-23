@@ -74,27 +74,29 @@ jobs:
           name: ye-userinfo-bot-linux-amd64
           path: dist/
 
-      # 1. Rolling Release on every commit merged to master
+      # 1. Rolling Release on every commit merged to master (Native GitHub CLI)
       - name: Publish Rolling Latest Release
         if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-        uses: softprops/action-gh-release@v3
-        with:
-          tag_name: latest
-          name: "Latest Automated Build"
-          body: |
-            ### 🤖 Automated Reproducible Build for `master`
-            - **Commit:** `${{ github.sha }}`
-            - **Branch:** `master`
-            - **Transparency:** Check `checksums.txt` to verify SHA-256 binary integrity against `/about` in the bot.
-          files: |
-            dist/*
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create latest dist/* \
+            --title "Latest Automated Build" \
+            --notes "### 🤖 Automated Reproducible Build for \`master\`
+          - **Commit:** \`${{ github.sha }}\`
+          - **Branch:** \`master\`
+          - **Transparency:** Check \`checksums.txt\` to verify SHA-256 binary integrity against \`/about\` in the bot." \
+            --generate-notes \
+            --clobber
 
-      # 2. Tagged Release on version tags (e.g. v1.0.0)
+      # 2. Tagged Release on version tags (Native GitHub CLI)
       - name: Publish Tagged Version Release
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v3
-        with:
-          files: |
-            dist/*
-          generate_release_notes: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          gh release create "$TAG_NAME" dist/* \
+            --title "$TAG_NAME" \
+            --generate-notes \
+            --clobber
